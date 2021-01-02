@@ -105,8 +105,8 @@ export function FundPage() {
     const [fundBalanceDollar, setFundBalanceDollar] = React.useState(0);
     const [maxProfitAllowed, setMaxProfitAllowed] = React.useState(0);
 
-    const treasuryAccountLink = "https://explorer.solana.com/account/" + (treasuryAccount.publicKey ? treasuryAccount.publicKey.toString() : "") + "?cluster=devnet";
-    const treasuryTokenAccountLink = "https://explorer.solana.com/account/" + (treasuryTokenAccount.publicKey ? treasuryTokenAccount.publicKey.toString() : "") + "?cluster=devnet";
+    const treasuryAccountLink = "https://explorer.solana.com/address/" + (treasuryAccount.publicKey ? treasuryAccount.publicKey.toString() : "") + "?cluster=devnet";
+    const treasuryTokenAccountLink = "https://explorer.solana.com/address/" + (treasuryTokenAccount ? treasuryTokenAccount.toString() : "") + "?cluster=devnet";
 
     const refreshTreasuryBalance = React.useCallback(() => {
         (async () => {
@@ -259,19 +259,25 @@ export function FundPage() {
             setWithdrawAmount(event.target.value);
         })();
     }, []);
-    if (connected && refresh == 0) {
+    if (refresh == 0) {
         setRefresh(1);
         (async () => {
             refreshChartData();
-            refreshBalance();
             refreshTreasuryBalance();
             refreshTreasuryTokenSupply();
-            if (userTokenAccount == 0) {
+
+            if (connected && userTokenAccount == 0) {
+                refreshBalance();
                 await getTokenAccounts(connection, wallet.publicKey, treasuryTokenAccount, setUserTokenAccount, setUserTokenBalance);
             }
         })();
     }
-
+    if (connected && userTokenAccount == 0) {
+        (async () => {
+            refreshBalance();
+            await getTokenAccounts(connection, wallet.publicKey, treasuryTokenAccount, setUserTokenAccount, setUserTokenBalance);
+        })();
+    }
     return (
         <div className="container">
             <div className="row justify-content-center mt-5">
@@ -294,7 +300,7 @@ export function FundPage() {
                         <Typography id="user-account-text">
                           Treasury Account:
                         </Typography>
-                        <a href={treasuryAccountLink} id="user-account-text" >
+                        <a target="_blank" href={treasuryAccountLink} id="user-account-text" >
                           {treasuryAccount.publicKey.toString()}
                         </a>
                         <Typography id="user-account-text">
@@ -310,7 +316,7 @@ export function FundPage() {
                         <Typography id="user-account-text">
                           Treasury Token Mint:
                         </Typography>
-                        <a href={treasuryTokenAccountLink} id="user-account-text">
+                        <a target="_blank" href={treasuryTokenAccountLink} id="user-account-text">
                           {treasuryTokenAccount ? treasuryTokenAccount.toString() : ''}
                         </a>
                         <Typography id="user-account-text">

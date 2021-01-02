@@ -196,7 +196,7 @@ export function PlayPage() {
                 <div className="col-md-8 mt-4 mt-md-0">
                     <div className="bg-half-transparent sr-border text-white">
                         <div className="card-header text-center">
-                            MY ACCOUNT - {connected ? 'Connected' : 'Disconnected'}
+                            MY ACCOUNT - {connected ? 'Connected' : 'Disconnected'} - DEVNET
                         </div>
                         <div className="card-body">
                             {connected ?

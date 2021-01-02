@@ -5,6 +5,7 @@ import { FundPage } from './pages/FundPage';
 import './index.css';
 import { WalletProvider } from "./util/wallet";
 import { useWallet } from "./util/wallet";
+import logo from './roll-horizontal-1.svg';
 
 import { BrowserRouter, Route, Switch, Redirect, useRouteMatch } from "react-router-dom";
 
@@ -52,7 +53,9 @@ export function Header () {
         <div className="container">
             <nav className="navbar navbar-dark navbar-expand-lg bg-transparent">
                 <div className="navbar-brand">
-                    <a className=" d-inline-block align-top text-sr" href="https://www.solanaroll.com">SOLANA<i>ROLL</i></a>
+                    <a href="/">
+                        <img className="d-inline-block align-top text-sr" src={logo}></img>
+                    </a>
                 </div>
                 <button className="navbar-toggler bg-dark" type="button" data-toggle="collapse" data-target="#navbarText"
                         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">

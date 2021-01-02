@@ -136,7 +136,7 @@ export function PlayPage() {
     }, [publicKey]);
     const refreshWager = React.useCallback((event) => {
         (async () => {
-            setWager(event.target.value.toFixed(9));
+            setWager(event.target.value);
             setNewProfit(roll_value, event.target.value);
             setRefresh(0)
         })();

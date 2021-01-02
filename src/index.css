@@ -11,6 +11,10 @@ body {
   background-position: right bottom;
 }
 
+.navbar-brand img {
+  max-width: 150px;
+}
+
 nav {
   height: 85px;
 }

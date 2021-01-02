@@ -10,15 +10,17 @@ import {
   LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
 
-import {useConnection, sendTransactionSequence, sendDepositSequence, sendWithdrawSequence, getTokenAccounts, getMintInfo} from "../util/connection"
+import {
+    useConnection,
+    sendDepositSequence,
+    sendWithdrawSequence,
+    getTokenAccounts,
+    getTokenLargestAccounts,
+    getMintInfo
+} from "../util/connection"
 
-import echarts from "echarts";
-
-
-
-import { TokenChart } from "../components/tokenChart";
 import { useWallet } from "../util/wallet";
-
+import ReactEcharts from 'echarts-for-react';
 
 const acc = "vFj/mjPXxWxMoVxwBpRfHKufaxK0RYy3Gd2rAmKlveF7oiinGDnsXlRSbXieC5x6prka4aQGE8tFRz17zLl38w==";
 const treasuryAccount = new Account(Buffer.from(acc, "base64"));
@@ -31,10 +33,60 @@ let splTokenProgram = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
 let programId = new PublicKey("8Nj5RBeppFvrLzF5t4t5i3i3B2ucx9qVUxp2nc5dVDGt");
 let treasuryTokenAccount = new PublicKey("6ME9zXExwYxqGV3XiXGVQwvQS6mq5QCucaVEnF5HyQ71");
 
+function hashCode(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return hash;
+}
+function intToRGB(i){
+    var c = (i & 0x00FFFFFF)
+        .toString(16)
+        .toUpperCase();
+
+    return "00000".substring(0, 6 - c.length) + c;
+}
+
+function getChartData(data) {
+    var legendData = [];
+    var colors = [];
+    var seriesData = [];
+    for (var i = 0; i < data.length; i++) {
+        var name;
+        if (i >= 9) {
+            name = "Others";
+            if (i == 9) {
+                legendData.push(name);
+                seriesData.push({
+                    name: name,
+                    value: data[i][1],
+                });
+                colors.push('#' + intToRGB(hashCode(name)));
+            } else {
+                seriesData[9].value = seriesData[9].value + seriesData[i].value;
+            }
+        } else {
+            name = data[i][0];
+            legendData.push(name.substring(0, 8) + "...");
+            seriesData.push({
+                name: name.substring(0, 8) + "...",
+                value: data[i][1],
+            });
+            colors.push('#' + intToRGB(hashCode(name)));
+        }
+    }
+    return {
+        legendData: legendData,
+        seriesData: seriesData,
+        colors: colors
+    };
+}
+
 export function FundPage() {
 
     const connection = useConnection();
-    const [history, setHistory] = React.useState([]);
+    const [chartData, setChartData] = React.useState([]);
     const [invalid, setInvalid] = React.useState(true);
     const [roll_value, setRollValue] = React.useState(51);
     const [chance, setChance] = React.useState(50);
@@ -53,6 +105,9 @@ export function FundPage() {
     const [fundBalanceDollar, setFundBalanceDollar] = React.useState(0);
     const [maxProfitAllowed, setMaxProfitAllowed] = React.useState(0);
 
+    const treasuryAccountLink = "https://explorer.solana.com/account/" + (treasuryAccount.publicKey ? treasuryAccount.publicKey.toString() : "") + "?cluster=devnet";
+    const treasuryTokenAccountLink = "https://explorer.solana.com/account/" + (treasuryTokenAccount.publicKey ? treasuryTokenAccount.publicKey.toString() : "") + "?cluster=devnet";
+
     const refreshTreasuryBalance = React.useCallback(() => {
         (async () => {
           try {
@@ -61,7 +116,7 @@ export function FundPage() {
               "singleGossip"
             );
             setFundBalance(balance/LAMPORTS_PER_SOL);
-            setFundBalanceDollar((balance/LAMPORTS_PER_SOL)*2.23); // TODO
+            setFundBalanceDollar(((balance/LAMPORTS_PER_SOL)*1.8).toFixed(2)); // TODO
             setMaxProfitAllowed((balance/LAMPORTS_PER_SOL)*0.01); // TODO
           } catch (err) {
               console.log(err);
@@ -79,49 +134,6 @@ export function FundPage() {
         setProfit(newProfit);
         setInvalid(newProfit > maxProfitAllowed);
     };
-
-    const handleChange = (event, newValue) => {
-        setRollValue(newValue);
-        setChance(newValue - 1);
-        setNewProfit(newValue, wager);
-    };
-
-    const makeRoll = useCallback(() => {
-        let hist = history.concat([{
-                wager_count: wager_count,
-                roll_under: roll_value,
-                profit: profit,
-                wager: wager,
-                result: null,
-                txid: null,
-        }]);
-        setHistory(hist);
-        setWagerCount(wager_count + 1);
-        refreshBalance();
-        console.log('connected: ' + connected);
-        if (connected) {
-            (async () => {
-                await sendTransactionSequence(
-                    connection,
-                    roll_value,
-                    wager,
-                    wager_count,
-                    wallet,
-                    sysvarClockPubKey,
-                    sysvarSlotHashesPubKey,
-                    programId,
-                    payerAccount,
-                    treasuryAccount,
-                    setBalance,
-                    setFundBalance,
-                    setFundBalanceDollar,
-                    hist,
-                    setHistory
-                );
-                setRefresh(0)
-            })();
-        }
-    }, [history, wager, profit, wager_count, roll_value, connected]);
 
     const depositToTreasury = useCallback(() => {
         console.log('depositing to treasury');
@@ -165,6 +177,54 @@ export function FundPage() {
         }
     }, [connected, wallet, withdrawAmount, payerAccount, userTokenAccount, userTokenBalance]);
 
+    const getOption = React.useCallback(() => {
+        return {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+                type: 'scroll',
+                orient: 'vertical',
+                right: 10,
+                top: 20,
+                bottom: 20,
+                data: chartData.legendData ?? [],
+                textStyle: {
+                    color: "#fff",
+                },
+            },
+            series: [
+                {
+                    name: 'SLR Token Holders',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['40%', '50%'],
+                    data: chartData.seriesData ?? [],
+                    color: chartData.colors ?? [],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+    }, [chartData]);
+
+    const refreshChartData = React.useCallback(() => {
+        (async () => {
+          try {
+              var d = await getTokenLargestAccounts(connection, wallet.publicKey, treasuryTokenAccount);
+              var data = getChartData(d);
+              setChartData(data);
+          } catch (err) {
+              console.log(err);
+          }
+        })();
+    }, [connection, wallet.publicKey, treasuryTokenAccount]);
     const refreshBalance = React.useCallback(() => {
         (async () => {
           try {
@@ -189,13 +249,6 @@ export function FundPage() {
           }
         })();
     }, [treasuryTokenAccount]);
-    const refreshWager = React.useCallback((event) => {
-        (async () => {
-            setWager(event.target.value);
-            setNewProfit(roll_value, event.target.value);
-            setRefresh(0)
-        })();
-    }, [roll_value]);
     const refreshDepositAmount = React.useCallback((event) => {
         (async () => {
             setDepositAmount(event.target.value);
@@ -209,6 +262,7 @@ export function FundPage() {
     if (connected && refresh == 0) {
         setRefresh(1);
         (async () => {
+            refreshChartData();
             refreshBalance();
             refreshTreasuryBalance();
             refreshTreasuryTokenSupply();
@@ -221,46 +275,59 @@ export function FundPage() {
     return (
         <div className="container">
             <div className="row justify-content-center mt-5">
-                {/*<div className="col-md-4">*/}
-                  {/*<div className="bg-half-transparent sr-border text-white">*/}
-                      {/*<div className="card-header text-center">*/}
-                        {/*TREASURY CHART*/}
-                      {/*</div>*/}
-                      {/*<div className="card-body" id="chartOuterDiv">*/}
-                        {/*<TokenChart*/}
-                            {/*mintAddress="none"*/}
-                        {/*/>*/}
-                      {/*</div>*/}
-                  {/*</div>*/}
-                {/*</div>*/}
-                <div className="col-md-8">
+                <div className="col-md-6">
                   <div className="bg-half-transparent sr-border text-white">
+                      <div className="card-header text-center">
+                        TREASURY TOKEN HOLDERS
+                      </div>
+                      <div className="card-body" id="chartOuterDiv">
+                          <ReactEcharts id="token-holdings-chart" option={getOption()} />
+                      </div>
+                  </div>
+                </div>
+                <div className="col-md-6 text-center">
+                  <div className="bg-half-transparent sr-border text-white h-100">
                       <div className="card-header text-center">
                         TREASURY FUND
                       </div>
                       <div className="card-body">
                         <Typography id="user-account-text">
-                          Account: {treasuryAccount.publicKey.toString()}
+                          Treasury Account:
+                        </Typography>
+                        <a href={treasuryAccountLink} id="user-account-text" >
+                          {treasuryAccount.publicKey.toString()}
+                        </a>
+                        <Typography id="user-account-text">
+                          Balance:
                         </Typography>
                         <Typography id="user-account-text">
-                          Balance: {fundBalance} SOL (${fundBalanceDollar})
+                          {fundBalance} SOL
+                        </Typography>
+                        <Typography id="user-account-text">
+                          (${fundBalanceDollar})
                         </Typography>
                         <br></br>
                         <Typography id="user-account-text">
-                          Treasury Token Mint: {treasuryTokenAccount ? treasuryTokenAccount.toString() : ''}
+                          Treasury Token Mint:
+                        </Typography>
+                        <a href={treasuryTokenAccountLink} id="user-account-text">
+                          {treasuryTokenAccount ? treasuryTokenAccount.toString() : ''}
+                        </a>
+                        <Typography id="user-account-text">
+                          Token Supply:
                         </Typography>
                         <Typography id="user-account-text">
-                          Treasury Token Supply: {tokenSupply / LAMPORTS_PER_SOL}
+                          {tokenSupply / LAMPORTS_PER_SOL}
                         </Typography>
                       </div>
                   </div>
                 </div>
             </div>
             <div className="row justify-content-center mt-5">
-                <div className="col-md-8">
+                <div className="col-md-12">
                     <div className="bg-half-transparent sr-border text-white">
                         <div className="card-header text-center">
-                            MY ACCOUNT - {connected ? 'Connected' : 'Disconnected'}
+                            MY ACCOUNT - {connected ? 'Connected' : 'Disconnected'} - DEVNET
                         </div>
                         <div className="card-body">
                             {connected ?

@@ -428,6 +428,25 @@ export const getTokenAccounts = async (
     return;
 };
 
+export const getTokenLargestAccounts = async (
+  connection: any,
+  owner: any,
+  mint: any,
+) => {
+    let data = [];
+    try {
+        const accounts = await connection.getTokenLargestAccounts(mint);
+        for (let i = 0; i < accounts.value.length; i++) {
+            data.push([accounts.value[i].address.toString(), accounts.value[i].uiAmount]);
+        }
+    } catch (e) {
+        console.log(e);
+    }
+    console.log('largest tokens:');
+    console.log(data);
+    return data;
+};
+
 export const sendTransactionSequence = async (
   connection: any,
   roll_value: any,

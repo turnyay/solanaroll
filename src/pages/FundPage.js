@@ -64,7 +64,7 @@ function getChartData(data) {
                 });
                 colors.push('#' + intToRGB(hashCode(name)));
             } else {
-                seriesData[9].value = seriesData[9].value + seriesData[i].value;
+                seriesData[9].value = seriesData[9].value + data[i][1];
             }
         } else {
             name = data[i][0];

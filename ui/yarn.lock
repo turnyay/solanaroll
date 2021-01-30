@@ -4555,13 +4555,20 @@
     "jsbn" "~0.1.0"
     "safer-buffer" "^2.1.0"
 
-"echarts@^5.0.0":
-  "integrity" "sha512-6SDcJbLVOcfQyjPg+spNU1+JVrkU1B9fzUa5tpbP/mMNUPyigCOJwcEIQAJSbp9jt5UP3EXvQR0vtYXIo9AjyA=="
-  "resolved" "https://registry.npmjs.org/echarts/-/echarts-5.0.0.tgz"
-  "version" "5.0.0"
+"echarts-for-react@^2.0.16":
+  "integrity" "sha512-VmHCktay2qKt/+wpL/C7thbvIa7dYBEey0/U4Zaqo+qeA4wx+uiCd5NeCsPIhD/0Pv+2qqNswqiNiUCtcgccOw=="
+  "resolved" "https://registry.npmjs.org/echarts-for-react/-/echarts-for-react-2.0.16.tgz"
+  "version" "2.0.16"
   dependencies:
-    "tslib" "1.10.0"
-    "zrender" "5.0.1"
+    "fast-deep-equal" "^2.0.1"
+    "size-sensor" "^1.0.0"
+
+"echarts@^3.0.0 || ^4.0.0", "echarts@^4.9.0":
+  "integrity" "sha512-+ugizgtJ+KmsJyyDPxaw2Br5FqzuBnyOWwcxPKO6y0gc5caYcfnEUIlNStx02necw8jmKmTafmpHhGo4XDtEIA=="
+  "resolved" "https://registry.npmjs.org/echarts/-/echarts-4.9.0.tgz"
+  "version" "4.9.0"
+  dependencies:
+    "zrender" "4.3.2"
 
 "ee-first@1.1.1":
   "integrity" "sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0="
@@ -5280,6 +5287,11 @@
   "integrity" "sha1-Ys8SAjTGg3hdkCNIqADvPgzCC8A="
   "resolved" "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
   "version" "0.1.8"
+
+"fast-deep-equal@^2.0.1":
+  "integrity" "sha1-ewUhjd+WZ79/Nwv3/bLLFf3Qqkk="
+  "resolved" "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-2.0.1.tgz"
+  "version" "2.0.1"
 
 "fast-deep-equal@^3.1.1":
   "integrity" "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
@@ -9717,7 +9729,7 @@
     "kleur" "^3.0.3"
     "sisteransi" "^1.0.4"
 
-"prop-types@^15.0.0", "prop-types@^15.6.2", "prop-types@^15.7.2":
+"prop-types@^15.0.0", "prop-types@^15.5.7", "prop-types@^15.6.2", "prop-types@^15.7.2":
   "integrity" "sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ=="
   "resolved" "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz"
   "version" "15.7.2"
@@ -10047,7 +10059,7 @@
     "loose-envify" "^1.4.0"
     "prop-types" "^15.6.2"
 
-"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^16.8.0", "react@^17.0.1", "react@>=15", "react@>=16.6.0", "react@17.0.1":
+"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^16.8.0", "react@^17.0.1", "react@>=0.13.2 || ^0.14 || ^15.0.0 || >=16.0.0", "react@>=15", "react@>=16.6.0", "react@17.0.1":
   "integrity" "sha512-lG9c9UuMHdcAexXtigOZLX8exLWkW0Ku29qPRU8uhF2R9BN96dLCt0psvzPLlHc5OWkgymP3qwTRgbnw5BKx3w=="
   "resolved" "https://registry.yarnpkg.com/react/-/react-17.0.1.tgz"
   "version" "17.0.1"
@@ -10895,6 +10907,11 @@
   "resolved" "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz"
   "version" "1.0.5"
 
+"size-sensor@^1.0.0":
+  "integrity" "sha512-QTy7MnuugCFXIedXRpUSk9gUnyNiaxIdxGfUjr8xxXOqIB3QvBUYP9+b51oCg2C4dnhaeNk/h57TxjbvoJrJUA=="
+  "resolved" "https://registry.npmjs.org/size-sensor/-/size-sensor-1.0.1.tgz"
+  "version" "1.0.1"
+
 "slash@^3.0.0":
   "integrity" "sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q=="
   "resolved" "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz"
@@ -11737,11 +11754,6 @@
   "integrity" "sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg=="
   "resolved" "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz"
   "version" "1.14.1"
-
-"tslib@1.10.0":
-  "integrity" "sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ=="
-  "resolved" "https://registry.npmjs.org/tslib/-/tslib-1.10.0.tgz"
-  "version" "1.10.0"
 
 "tsutils@^3.17.1":
   "integrity" "sha512-kzeQ5B8H3w60nFY2g8cJIuH7JDpsALXySGtwGJ0p2LSjLgay3NdIpqq5SoOBe46bKDW2iq25irHCr8wjomUS2g=="
@@ -12671,9 +12683,7 @@
     "y18n" "^4.0.0"
     "yargs-parser" "^18.1.2"
 
-"zrender@5.0.1":
-  "integrity" "sha512-i8FNCKAKfF0EfZFJ6w2p30umBrCyy481/PePFQqPdtNgCl5Hp5z7/dovqb7soEoFkhNvhjJ/J4W9zFALeae6yA=="
-  "resolved" "https://registry.npmjs.org/zrender/-/zrender-5.0.1.tgz"
-  "version" "5.0.1"
-  dependencies:
-    "tslib" "1.10.0"
+"zrender@4.3.2":
+  "integrity" "sha512-bIusJLS8c4DkIcdiK+s13HiQ/zjQQVgpNohtd8d94Y2DnJqgM1yjh/jpDb8DoL6hd7r8Awagw8e3qK/oLaWr3g=="
+  "resolved" "https://registry.npmjs.org/zrender/-/zrender-4.3.2.tgz"
+  "version" "4.3.2"

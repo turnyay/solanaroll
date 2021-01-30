@@ -1,5 +1,5 @@
 /**
- * Hello world
+ * Solanaroll Deploy
  *
  * @flow
  */
@@ -8,15 +8,12 @@ import {
   establishConnection,
   establishPayer,
   loadProgram,
-  loadTestProgram,
-  sendCommit,
   sendDeposit,
   createGameAccount,
   reportHellos,
-} from './hello_world';
+} from './deploy';
 
 async function main() {
-  console.log("Let's say hello to a Solana account...");
 
   // Establish connection to the cluster
   await establishConnection();

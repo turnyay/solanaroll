@@ -41,12 +41,6 @@ export function PlayPage() {
     const [refresh, setRefresh] = React.useState(0);
     const [balance, setBalance] = React.useState(0);
     const { publicKey, wallet, connected } = useWallet();
-
-    // const [depositAmount, setDepositAmount] = React.useState(1);
-    // const [withdrawAmount, setWithdrawAmount] = React.useState(1);
-    // const [userTokenAccount, setUserTokenAccount] = React.useState(0);
-    // const [userTokenBalance, setUserTokenBalance] = React.useState(0);
-
     const [fundBalance, setFundBalance] = React.useState(0);
     const [fundBalanceDollar, setFundBalanceDollar] = React.useState(0);
     const [maxProfitAllowed, setMaxProfitAllowed] = React.useState(0);

@@ -1,7 +1,5 @@
 // @flow
 
-import bs58 from 'bs58';
-
 import {
   Account,
   Connection,
@@ -15,20 +13,18 @@ import {
   Transaction,
 } from '@solana/web3.js';
 import { Token, MintLayout, AccountLayout } from "@solana/spl-token";
-
-let TOKEN_PROGRAM_ID = new PublicKey(
-  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-);
-
-let TREASURY_TOKEN_PRECISION = 9;
-
 import fs from 'mz/fs';
 import * as BufferLayout from 'buffer-layout';
-
 import {url, urlTls} from '../../url';
 import {Store} from './util/store';
 import {newAccountWithLamports} from './util/new-account-with-lamports';
 import {sendAndConfirmTransaction} from './util/send-and-confirm-transaction';
+
+
+let TOKEN_PROGRAM_ID = new PublicKey(
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+);
+let TREASURY_TOKEN_PRECISION = 9;
 
 /**
  * Connection to the network
@@ -36,34 +32,27 @@ import {sendAndConfirmTransaction} from './util/send-and-confirm-transaction';
 let connection: Connection;
 
 /**
- * Connection to the network
+ * Accounts
  */
-let treasuryAccount: Account;
-let programAccount: Account;
 let payerAccount: Account;
-let gameFundAccount: Account;
+let programAccount: Account;
+let treasuryAccount: Account;
 let treasuryTokenAccount: Account;
-let userTokenAccount: Account;
 
-let programSecretKey;
+/**
+ * Keys
+ */
 let payerSecretKey;
 let treasurySecretKey;
-
-/**
- * Hello world's program id
- */
-let programId: PublicKey;
-
-/**
- * The public key of the account we are saying hello to
- */
-let greetedPubkey: PublicKey;
-let greetedPubkey2: PublicKey;
 let gameFundPubkey: PublicKey;
 let treasuryPubkey: PublicKey;
 
-const pathToProgram = 'dist/program/helloworld.so';
-const pathToTestProgram = 'dist/program/testprogram.so';
+/**
+ * Solanaroll Program ID
+ */
+let programId: PublicKey;
+
+const pathToProgram = 'dist/program/solanaroll.so';
 
 /**
  * Layout of the greeted account data

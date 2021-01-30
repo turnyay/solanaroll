@@ -1,7 +1,9 @@
+# Warning
+Any content produced by Solanaroll, or developer resources that Solanaroll provides, are for educational and inspiration purposes only. Solanaroll does not encourage, induce or sanction the deployment of any such applications in violation of applicable laws or regulations.
+
 # SOLANAROLL
 
 [https://www.solanaroll.com](https://www.solanaroll.com)
-
 
 Solanaroll is a fast, inexpensive dice game with a user-funded pooled treasury. 
 The dice game is provably-fair and has a 1% house edge.

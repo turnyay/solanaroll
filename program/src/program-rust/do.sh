@@ -26,16 +26,16 @@ perform_action() {
     case "$1" in
     build)
         "$sdkDir"/rust/build.sh "$PWD"
-        
+
         so_path="$targetDir/$profile"
-        so_name="solana_bpf_helloworld"
+        so_name="solanaroll"
         if [ -f "$so_path/${so_name}.so" ]; then
             cp "$so_path/${so_name}.so" "$so_path/${so_name}_debug.so"
             "$sdkDir"/dependencies/llvm-native/bin/llvm-objcopy --strip-all "$so_path/${so_name}.so" "$so_path/$so_name.so"
         fi
 
         mkdir -p ../../dist/program
-        cp "$so_path/${so_name}.so" ../../dist/program/helloworld.so
+        cp "$so_path/${so_name}.so" ../../dist/program/solanaroll.so
         ;;
     clean)
         "$sdkDir"/rust/clean.sh "$PWD"
@@ -62,7 +62,7 @@ perform_action() {
             "$0" build
 
             so_path="$targetDir/$profile"
-            so_name="solana_bpf_helloworld"
+            so_name="solanaroll"
             so="$so_path/${so_name}_debug.so"
             dump="$so_path/${so_name}-dump"
 

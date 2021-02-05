@@ -1,6 +1,11 @@
+use thiserror::Error;
+use num_derive::FromPrimitive;
+use solana_sdk::{decode_error::DecodeError};
+use solana_sdk::{
+    program_error::ProgramError,
+};
 
 /// Errors that may be returned by Solanaroll
-
 #[derive(Clone, Debug, Eq, Error, FromPrimitive, PartialEq)]
 pub enum SolanarollError {
     /// The address of the admin fee account is incorrect.
@@ -58,13 +63,13 @@ pub enum SolanarollError {
     #[error("Conversion to u64 failed with an overflow or underflow")]
     ConversionFailure,
 }
-impl From<SwapError> for ProgramError {
-    fn from(e: SwapError) -> Self {
+impl From<SolanarollError> for ProgramError {
+    fn from(e: SolanarollError) -> Self {
         ProgramError::Custom(e as u32)
     }
 }
-impl<T> DecodeError<T> for SwapError {
+impl<T> DecodeError<T> for SolanarollError {
     fn type_of() -> &'static str {
-        "Swap Error"
+        "Solanaroll Error"
     }
 }

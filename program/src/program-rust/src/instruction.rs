@@ -28,7 +28,7 @@ pub enum SolanarollInstruction {
     CommitReveal {
         reveal_number: u64,
         amount: u64,
-        roll_under: u64,
+        roll_under: u32,
     },
     /// Resolves a dice game roll
     ///
@@ -38,7 +38,7 @@ pub enum SolanarollInstruction {
     ResolveRoll {
         reveal_number: u64,
         amount: u64,
-        roll_under: u64,
+        roll_under: u32,
     },
 }
 
@@ -51,12 +51,12 @@ impl SolanarollInstruction {
             0 => Self::CommitReveal {
                 reveal_number: Self::unpack_amount(rest)?,
                 amount: Self::unpack_amount(rest)?,
-                roll_under: Self::unpack_amount(rest)?,
+                roll_under: Self::unpack_amount_32(rest)?,
             },
             1 => Self::ResolveRoll {
                 reveal_number: Self::unpack_amount(rest)?,
                 amount: Self::unpack_amount(rest)?,
-                roll_under: Self::unpack_amount(rest)?,
+                roll_under: Self::unpack_amount_32(rest)?,
             },
             2 => Self::Deposit {
                 amount: Self::unpack_amount(rest)?,
@@ -73,6 +73,15 @@ impl SolanarollInstruction {
             .get(..8)
             .and_then(|slice| slice.try_into().ok())
             .map(u64::from_le_bytes)
+            .ok_or(InvalidInstruction)?;
+        Ok(amount)
+    }
+
+    fn unpack_amount_32(input: &[u8]) -> Result<u32, ProgramError> {
+        let amount = input
+            .get(..4)
+            .and_then(|slice| slice.try_into().ok())
+            .map(u32::from_le_bytes)
             .ok_or(InvalidInstruction)?;
         Ok(amount)
     }

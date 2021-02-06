@@ -45,7 +45,7 @@ pub fn get_slot_hash(data: &[u8], slot_height: u64) -> Hash {
     let current_slot = u64::from_le_bytes(data[8..16].try_into().unwrap());
     let diff = current_slot - slot_height;
     if (diff > MAX_NUM_SLOT_HASHES) {
-        let mut buf = [0u8; HASH_BYTES];
+        let buf = [0u8; HASH_BYTES];
         return Hash::new(&buf);
     } else {
         let target_index = (16 + (diff * 40)) as usize;

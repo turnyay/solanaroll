@@ -10,12 +10,12 @@ export async function newAccountWithLamports(
 ): Promise<Account> {
   const account = new Account();
 
-  lamports = 3000000000;
+  lamports = 7000000000;
 
-  let retries = 10;
+  let retries = 100;
   await connection.requestAirdrop(account.publicKey, lamports);
   for (;;) {
-    await sleep(500);
+    await sleep(1000);
     if (lamports == (await connection.getBalance(account.publicKey))) {
       return account;
     }

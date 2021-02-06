@@ -5,36 +5,20 @@ use crate::error::SolanarollError::InvalidInstruction;
 
 pub enum SolanarollInstruction {
     /// Deposit funds - receive tokens
-    ///
-    ///
-    /// Accounts expected:
-    ///
     Deposit {
         amount: u64,
     },
     /// Withdraw funds - burn tokens
-    ///
-    ///
-    /// Accounts expected:
-    ///
     Withdraw {
         amount: u64,
     },
     /// Commits a reveal number to play dice game
-    ///
-    ///
-    /// Accounts expected:
-    ///
     CommitReveal {
         reveal_number: u64,
         amount: u64,
         roll_under: u32,
     },
     /// Resolves a dice game roll
-    ///
-    ///
-    /// Accounts expected:
-    ///
     ResolveRoll {
         reveal_number: u64,
         amount: u64,

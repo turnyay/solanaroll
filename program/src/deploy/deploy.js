@@ -1,5 +1,7 @@
 // @flow
 
+import bs58 from 'bs58';
+
 import {
   Account,
   Connection,
@@ -13,18 +15,20 @@ import {
   Transaction,
 } from '@solana/web3.js';
 import { Token, MintLayout, AccountLayout } from "@solana/spl-token";
-import fs from 'mz/fs';
-import * as BufferLayout from 'buffer-layout';
-import {url, urlTls} from '../../url';
-import {Store} from './util/store';
-import {newAccountWithLamports} from './util/new-account-with-lamports';
-import {sendAndConfirmTransaction} from './util/send-and-confirm-transaction';
-
 
 let TOKEN_PROGRAM_ID = new PublicKey(
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 );
+
 let TREASURY_TOKEN_PRECISION = 9;
+
+import fs from 'mz/fs';
+import * as BufferLayout from 'buffer-layout';
+
+import {url, urlTls} from '../../url';
+import {Store} from './util/store';
+import {newAccountWithLamports} from './util/new-account-with-lamports';
+import {sendAndConfirmTransaction} from './util/send-and-confirm-transaction';
 
 /**
  * Connection to the network
@@ -32,25 +36,31 @@ let TREASURY_TOKEN_PRECISION = 9;
 let connection: Connection;
 
 /**
- * Accounts
+ * Connection to the network
  */
-let payerAccount: Account;
-let programAccount: Account;
 let treasuryAccount: Account;
+let programAccount: Account;
+let payerAccount: Account;
+let gameFundAccount: Account;
 let treasuryTokenAccount: Account;
+let userTokenAccount: Account;
 
-/**
- * Keys
- */
+let programSecretKey;
 let payerSecretKey;
 let treasurySecretKey;
-let gameFundPubkey: PublicKey;
-let treasuryPubkey: PublicKey;
 
 /**
- * Solanaroll Program ID
+ * Hello world's program id
  */
 let programId: PublicKey;
+
+/**
+ * The public key of the account we are saying hello to
+ */
+let greetedPubkey: PublicKey;
+let greetedPubkey2: PublicKey;
+let gameFundPubkey: PublicKey;
+let treasuryPubkey: PublicKey;
 
 const pathToProgram = 'dist/program/solanaroll.so';
 
@@ -106,12 +116,11 @@ function createSplAccount(
 
 
 /**
- * Establish an account to pay for everything
+ * Establish an account that owns every account deployed
  */
-export async function establishPayer(): Promise<void> {
+export async function establishOwner(): Promise<void> {
 
   const store = new Store();
-
   try {
     let config = await store.load('config.json');
     if (config.programId !== "") {
@@ -261,7 +270,7 @@ export async function loadProgram(): Promise<void> {
           payerAccount,
           programAccount,
           data,
-          BPF_LOADER_DEPRECATED_PROGRAM_ID,
+          BPF_LOADER_PROGRAM_ID,
       );
       programId = programAccount.publicKey;
       console.log('Program loaded to account', programId.toBase58());
@@ -391,8 +400,6 @@ export async function loadProgram(): Promise<void> {
       console.log('sent ' + tx);
       console.log("created token accounts");
       console.log("token acc " + liquidityTokenAccount.publicKey.toBase58());
-      console.log("token acc " + liquidityTokenAccount.publicKey.toBase58());
-      console.log("tx" + tx);
 
       // let instructions: TransactionInstruction[] = [];
       // let cleanupInstructions: TransactionInstruction[] = [];
@@ -460,6 +467,19 @@ export async function loadProgram(): Promise<void> {
   });
 }
 
+function longToByteArray(/*long*/long) {
+    // we want to represent the input as a 8-bytes array
+    var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+
+    for ( var index = 0; index < byteArray.length; index ++ ) {
+        var byte = long & 0xff;
+        byteArray [ index ] = byte;
+        long = (long - byte) / 256 ;
+    }
+
+    return byteArray;
+};
+
 /**
  * sendDeposit
  */
@@ -515,7 +535,7 @@ export async function sendDeposit(): Promise<void> {
     );
 
     // Send command 2
-    console.log('Sending command 2');
+    console.log('Sending DEPOSIT');
     console.log(treasuryTokenAccount.publicKey.toBase58());
     console.log(userTokenAccount.publicKey.toBase58());
     const instruction = new TransactionInstruction({
@@ -526,7 +546,7 @@ export async function sendDeposit(): Promise<void> {
             {pubkey: splTokenProgram, isSigner: false, isWritable: false},
             {pubkey: treasuryAccount.publicKey, isSigner: false, isWritable: true}],
         programId,
-        data: Buffer.from([2]),
+        data: Buffer.from([2, ...longToByteArray(1000000000)])
     });
 
   let instructions = new Transaction();

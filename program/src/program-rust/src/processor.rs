@@ -13,7 +13,6 @@ use solana_sdk::{
     },
 };
 
-
 use solana_sdk::program::invoke_signed;
 use spl_token::{instruction};
 use solana_sdk::program_pack::Pack as TokenPack;
@@ -22,22 +21,6 @@ use spl_token::state::{Account as TokenAccount, Mint};
 use num_derive::FromPrimitive;
 use solana_sdk::{decode_error::DecodeError};
 use thiserror::Error;
-
-
-// ************************************************************************************************
-
-// use solana_program::{
-//     account_info::{next_account_info, AccountInfo},
-//     entrypoint::ProgramResult,
-//     msg,
-//     program::{invoke, invoke_signed},
-//     program_error::ProgramError,
-//     program_pack::{IsInitialized, Pack},
-//     pubkey::Pubkey,
-//     sysvar::{rent::Rent, Sysvar},
-// };
-//
-// use spl_token::state::Account as TokenAccount;
 
 use crate::{
     error::SolanarollError,
@@ -81,20 +64,36 @@ impl Processor {
         program_id: &Pubkey,
     ) -> ProgramResult {
 
+        let samount = amount.to_string();
+        let amount_str: &str = &samount;
+        msg!("Amount: ");
+        msg!(amount_str);
+
         if amount <= 0 {
             msg!("Amount is invalid");
             return Err(ProgramError::InvalidAccountData);
         }
 
+        msg!("Getting accounts");
+
         let accounts_iter = &mut accounts.iter();
         // Set accounts
         let payer_account = next_account_info(accounts_iter)?;
+        let fund_account = next_account_info(accounts_iter)?;
         let treasury_token_account = next_account_info(accounts_iter)?;
         let user_token_account = next_account_info(accounts_iter)?;
         let spl_token_program = next_account_info(accounts_iter)?;
         let treasury_account = next_account_info(accounts_iter)?;
 
+        let fund_account_balance = fund_account.lamports();
         let treasury_account_balance = treasury_account.lamports();
+
+        if fund_account_balance <= 0 {
+            msg!("Treasury fund account is empty");
+            return Err(ProgramError::InvalidAccountData);
+        }
+
+        msg!("invoke: spl_token::instruction::mint_to");
 
         let treasury_mint = unpack_mint(&treasury_token_account.data.borrow())?;
 
@@ -105,7 +104,15 @@ impl Processor {
         msg!(supply_str);
 
         let (mint_address, mint_bump_seed) = Pubkey::find_program_address(&[&payer_account.key.to_bytes(), br"mint"], &spl_token_program.key);
+        //
+        // let amount_str = amount.to_string();
+        // let samount_str: &str = &amount_str;
+        // msg!("Fund amount:");
+        // msg!(samount_str);
 
+        // Set amount equal to lamports if no supply
+        // Otherwise, set pro-rated based on funds/supply
+        let mut amount = fund_account_balance;
         let amount_str = amount.to_string();
         let samount_str: &str = &amount_str;
         msg!("Fund amount:");
@@ -149,6 +156,8 @@ impl Processor {
             &[mint_bump_seed],
         ];
 
+        msg!("Minting");
+
         invoke_signed(
             &mint_to_instr,
             account_infos,
@@ -157,7 +166,7 @@ impl Processor {
 
         msg!("Mint successful");
 
-        **payer_account.lamports.borrow_mut() -= amount;
+        **fund_account.lamports.borrow_mut() -= amount;
         **treasury_account.lamports.borrow_mut() += amount;
 
         msg!("Deposit successful");
@@ -321,7 +330,7 @@ impl Processor {
                 let slot_hash = get_slot_hash(&slot_hashes_data, saved_slot);
 
                 // Couldn't find slot_height in recent slots, invalid
-                let mut buf = [0u8; HASH_BYTES];
+                let buf = [0u8; HASH_BYTES];
                 if slot_hash == Hash::new(&buf) {
                     **fund_account.lamports.borrow_mut() -= fund_account_balance;
                     **user_account.lamports.borrow_mut() += fund_account_balance;

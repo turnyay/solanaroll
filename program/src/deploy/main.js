@@ -6,7 +6,7 @@
 
 import {
   establishConnection,
-  establishPayer,
+  establishOwner,
   loadProgram,
   sendDeposit,
   createGameAccount,
@@ -18,8 +18,8 @@ async function main() {
   // Establish connection to the cluster
   await establishConnection();
 
-  // Determine who pays for the fees
-  await establishPayer();
+  // Obtain owner for all accounts
+  await establishOwner();
 
   // TEST PROGRAM
   // await loadTestProgram();
